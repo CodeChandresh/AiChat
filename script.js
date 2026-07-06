@@ -6,10 +6,13 @@ const themeToggleBtn = document.getElementById('themeToggleBtn');
 const themeIcon = document.getElementById('themeIcon');
 const clearChatBtn = document.getElementById('clearChatBtn');
 const welcomeMessage = document.getElementById('welcomeMessage');
+const fileUpload = document.getElementById('fileUpload');
+const uploadBtn = document.getElementById('uploadBtn');
 
 // State
 let isGenerating = false;
 let chatHistory = [];
+let knowledgeBase = [];
 
 // Configuration for Marked.js and Highlight.js
 marked.setOptions({
@@ -51,9 +54,20 @@ themeToggleBtn.addEventListener('click', () => {
 // --- Feature 2: Chat History Persistence ---
 function saveChatHistory() {
     localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+    localStorage.setItem('knowledgeBase', JSON.stringify(knowledgeBase));
 }
 
 function loadChatHistory() {
+    const savedKB = localStorage.getItem('knowledgeBase');
+    if (savedKB) {
+        try {
+            knowledgeBase = JSON.parse(savedKB);
+        } catch(e) {
+            console.error("Error loading knowledge base", e);
+            knowledgeBase = [];
+        }
+    }
+
     const saved = localStorage.getItem('chatHistory');
     if (saved) {
         try {
@@ -89,9 +103,11 @@ function loadChatHistory() {
 
 // --- Feature 5: Clear Chat ---
 clearChatBtn.addEventListener('click', () => {
-    if (confirm('Are you sure you want to clear the conversation?')) {
+    if (confirm('Are you sure you want to clear the conversation and knowledge base?')) {
         chatHistory = [];
+        knowledgeBase = [];
         localStorage.removeItem('chatHistory');
+        localStorage.removeItem('knowledgeBase');
 
         // Remove all messages except welcome message
         const messages = chatContainer.querySelectorAll('.message-container');
@@ -104,6 +120,42 @@ clearChatBtn.addEventListener('click', () => {
         }, 50);
     }
 });
+
+// --- Feature 6: RAG Document Upload ---
+uploadBtn.addEventListener('click', () => {
+    fileUpload.click();
+});
+
+fileUpload.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const text = e.target.result;
+        processDocument(text, file.name);
+    };
+    reader.readAsText(file);
+
+    // Reset input
+    fileUpload.value = '';
+});
+
+function processDocument(text, filename) {
+    // Basic chunking: split by paragraphs (double newline)
+    const chunks = text.split(/\n\s*\n/).map(chunk => chunk.trim()).filter(chunk => chunk.length > 0);
+
+    // Add to knowledge base
+    knowledgeBase = chunks;
+
+    // Notify user
+    const sysMsg = `*System:* Uploaded \`${filename}\` successfully. Extracted ${chunks.length} chunks into the knowledge base. Try asking questions about it!`;
+    appendBotMessage(sysMsg, true);
+
+    // Save to history so the system message persists
+    chatHistory.push({ role: 'bot', content: sysMsg });
+    saveChatHistory();
+}
 
 // --- Auto-resize textarea ---
 userInput.addEventListener('input', function() {
@@ -216,8 +268,43 @@ function showTypingIndicator() {
     return div;
 }
 
+// RAG Search Function
+function searchKnowledgeBase(query) {
+    if (knowledgeBase.length === 0) return null;
+
+    const queryWords = query.toLowerCase().split(/\s+/).filter(w => w.length > 2);
+    if (queryWords.length === 0) return null;
+
+    // Score chunks based on keyword overlap
+    const scoredChunks = knowledgeBase.map(chunk => {
+        const lowerChunk = chunk.toLowerCase();
+        let score = 0;
+        queryWords.forEach(word => {
+            if (lowerChunk.includes(word)) score++;
+        });
+        return { chunk, score };
+    });
+
+    // Sort by highest score
+    scoredChunks.sort((a, b) => b.score - a.score);
+
+    // Return best chunk if it has a match
+    if (scoredChunks[0] && scoredChunks[0].score > 0) {
+        return scoredChunks[0].chunk;
+    }
+
+    return null;
+}
+
 // Simulate an AI response based on keywords
 function getSimulatedResponse(input) {
+    // 1. Check Knowledge Base for RAG
+    const retrievedContext = searchKnowledgeBase(input);
+    if (retrievedContext) {
+        return `Based on the uploaded document, I found the following relevant information:\n\n<div class="retrieved-context border-l-4 border-blue-500 pl-4 py-2 my-4 bg-blue-50 dark:bg-blue-900/20 italic text-gray-700 dark:text-gray-300">${retrievedContext}</div>\n\nI hope this answers your question!`;
+    }
+
+    // 2. Default Keyword Responses
     const lowerInput = input.toLowerCase();
 
     if (lowerInput.includes('hello') || lowerInput.includes('hi')) {
