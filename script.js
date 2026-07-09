@@ -54,6 +54,9 @@ themeToggleBtn.addEventListener('click', () => {
 // --- Feature 2: Chat History Persistence ---
 function saveChatHistory() {
     localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+}
+
+function saveKnowledgeBase() {
     localStorage.setItem('knowledgeBase', JSON.stringify(knowledgeBase));
 }
 
@@ -147,6 +150,7 @@ function processDocument(text, filename) {
 
     // Add to knowledge base
     knowledgeBase = chunks;
+    saveKnowledgeBase();
 
     // Notify user
     const sysMsg = `*System:* Uploaded \`${filename}\` successfully. Extracted ${chunks.length} chunks into the knowledge base. Try asking questions about it!`;
