@@ -158,9 +158,15 @@ function processDocument(text, filename) {
 }
 
 // --- Auto-resize textarea ---
+let resizeTimeout;
 userInput.addEventListener('input', function() {
-    this.style.height = 'auto';
-    this.style.height = (this.scrollHeight) + 'px';
+    if (!resizeTimeout) {
+        resizeTimeout = requestAnimationFrame(() => {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+            resizeTimeout = null;
+        });
+    }
 
     // Enable/disable send button
     if (this.value.trim().length > 0 && !isGenerating) {
