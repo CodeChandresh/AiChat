@@ -301,7 +301,7 @@ function getSimulatedResponse(input) {
     // 1. Check Knowledge Base for RAG
     const retrievedContext = searchKnowledgeBase(input);
     if (retrievedContext) {
-        return `Based on the uploaded document, I found the following relevant information:\n\n<div class="retrieved-context border-l-4 border-blue-500 pl-4 py-2 my-4 bg-blue-50 dark:bg-blue-900/20 italic text-gray-700 dark:text-gray-300">${retrievedContext}</div>\n\nI hope this answers your question!`;
+        return `Based on the uploaded document, I found the following relevant information:\n\n<div class="retrieved-context border-l-4 border-blue-500 pl-4 py-2 my-4 bg-blue-50 dark:bg-blue-900/20 italic text-gray-700 dark:text-gray-300">${escapeHTML(retrievedContext)}</div>\n\nI hope this answers your question!`;
     }
 
     // 2. Default Keyword Responses
