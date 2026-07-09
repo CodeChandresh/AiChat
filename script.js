@@ -307,24 +307,32 @@ function getSimulatedResponse(input) {
     // 2. Default Keyword Responses
     const lowerInput = input.toLowerCase();
 
-    if (lowerInput.includes('hello') || lowerInput.includes('hi')) {
-        return "Hello there! How can I assist you today? I'm a simulated AI with features like **Markdown**, *syntax highlighting*, and theme toggling.";
-    }
+    const defaultResponses = [
+        {
+            keywords: ['hello', 'hi'],
+            response: "Hello there! How can I assist you today? I'm a simulated AI with features like **Markdown**, *syntax highlighting*, and theme toggling."
+        },
+        {
+            keywords: ['code', 'python'],
+            response: "Sure! Here is a simple Python function to calculate the Fibonacci sequence:\n\n```python\ndef fibonacci(n):\n    if n <= 0:\n        return []\n    elif n == 1:\n        return [0]\n    \n    sequence = [0, 1]\n    while len(sequence) < n:\n        next_val = sequence[-1] + sequence[-2]\n        sequence.append(next_val)\n        \n    return sequence\n\nprint(fibonacci(10))\n```\n\nNotice how the syntax highlighting works!"
+        },
+        {
+            keywords: ['javascript', 'js'],
+            response: "Here's a quick JavaScript example of an arrow function:\n\n```javascript\nconst greet = (name) => {\n  console.log(`Hello, ${name}!`);\n};\n\ngreet('World');\n```"
+        },
+        {
+            keywords: ['markdown'],
+            response: "I support various Markdown features:\n\n1. **Bold text**\n2. *Italic text*\n3. [Links](https://example.com)\n4. `Inline code`\n\n> Blockquotes are also supported nicely.\n\n### Headings work too!"
+        },
+        {
+            keywords: ['features'],
+            response: "Here are the 5 features built into this chat interface:\n\n1. 🌙 **Dark/Light Theme Toggle**\n2. 💾 **Persistent Chat History** (via localStorage)\n3. 📝 **Markdown & Code Highlighting**\n4. ⏳ **Simulated Typing Indicator**\n5. 🗑️ **Clear Conversation** functionality"
+        }
+    ];
 
-    if (lowerInput.includes('code') || lowerInput.includes('python')) {
-        return "Sure! Here is a simple Python function to calculate the Fibonacci sequence:\n\n```python\ndef fibonacci(n):\n    if n <= 0:\n        return []\n    elif n == 1:\n        return [0]\n    \n    sequence = [0, 1]\n    while len(sequence) < n:\n        next_val = sequence[-1] + sequence[-2]\n        sequence.append(next_val)\n        \n    return sequence\n\nprint(fibonacci(10))\n```\n\nNotice how the syntax highlighting works!";
-    }
-
-    if (lowerInput.includes('javascript') || lowerInput.includes('js')) {
-        return "Here's a quick JavaScript example of an arrow function:\n\n```javascript\nconst greet = (name) => {\n  console.log(`Hello, ${name}!`);\n};\n\ngreet('World');\n```";
-    }
-
-    if (lowerInput.includes('markdown')) {
-        return "I support various Markdown features:\n\n1. **Bold text**\n2. *Italic text*\n3. [Links](https://example.com)\n4. `Inline code`\n\n> Blockquotes are also supported nicely.\n\n### Headings work too!";
-    }
-
-    if (lowerInput.includes('features')) {
-        return "Here are the 5 features built into this chat interface:\n\n1. 🌙 **Dark/Light Theme Toggle**\n2. 💾 **Persistent Chat History** (via localStorage)\n3. 📝 **Markdown & Code Highlighting**\n4. ⏳ **Simulated Typing Indicator**\n5. 🗑️ **Clear Conversation** functionality";
+    const match = defaultResponses.find(item => item.keywords.some(kw => lowerInput.includes(kw)));
+    if (match) {
+        return match.response;
     }
 
     // Default response
