@@ -25,6 +25,14 @@ marked.setOptions({
 });
 
 // --- Feature 1: Theme Toggle ---
+function updateThemeIcon(isDark) {
+    if (isDark) {
+        themeIcon.classList.replace('fa-moon', 'fa-sun');
+    } else {
+        themeIcon.classList.replace('fa-sun', 'fa-moon');
+    }
+}
+
 function initTheme() {
     // Check localStorage or system preference
     const savedTheme = localStorage.getItem('theme');
@@ -32,21 +40,20 @@ function initTheme() {
 
     if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
         document.documentElement.classList.add('dark');
-        themeIcon.classList.replace('fa-moon', 'fa-sun');
+        updateThemeIcon(true);
     } else {
         document.documentElement.classList.remove('dark');
-        themeIcon.classList.replace('fa-sun', 'fa-moon');
+        updateThemeIcon(false);
     }
 }
 
 themeToggleBtn.addEventListener('click', () => {
     const isDark = document.documentElement.classList.toggle('dark');
+    updateThemeIcon(isDark);
 
     if (isDark) {
-        themeIcon.classList.replace('fa-moon', 'fa-sun');
         localStorage.setItem('theme', 'dark');
     } else {
-        themeIcon.classList.replace('fa-sun', 'fa-moon');
         localStorage.setItem('theme', 'light');
     }
 });
