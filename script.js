@@ -368,6 +368,7 @@ async function generateResponse(userText) {
     let currentText = "";
     // Break by chunks (characters or words to make it look like streaming)
     const chunkSize = 3;
+    let isScrollPending = false;
 
     for (let i = 0; i < fullResponseText.length; i += chunkSize) {
         currentText += fullResponseText.substring(i, i + chunkSize);
@@ -377,7 +378,13 @@ async function generateResponse(userText) {
         // but for a simple simulation this works well enough.
         contentBox.innerHTML = marked.parse(currentText) + '<span class="streaming-cursor ml-1 inline-block w-2 h-4 bg-gray-500 animate-pulse"></span>';
 
-        scrollToBottom();
+        if (!isScrollPending) {
+            isScrollPending = true;
+            requestAnimationFrame(() => {
+                scrollToBottom();
+                isScrollPending = false;
+            });
+        }
 
         // Delay between chunks
         await new Promise(r => setTimeout(r, 10 + Math.random() * 30));

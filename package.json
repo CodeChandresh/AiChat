@@ -1,0 +1,25 @@
+{
+  "name": "app",
+  "version": "1.0.0",
+  "description": "A simple, simulated AI chatbot interface built with vanilla HTML, CSS, and JavaScript. It does not require a build step or bundler.",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CodeChandresh/AiChat.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/CodeChandresh/AiChat/issues"
+  },
+  "homepage": "https://github.com/CodeChandresh/AiChat#readme",
+  "dependencies": {
+    "express": "^5.2.1",
+    "puppeteer": "^25.3.0"
+  }
+}
