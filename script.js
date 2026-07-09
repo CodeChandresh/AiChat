@@ -422,3 +422,10 @@ document.addEventListener('DOMContentLoaded', () => {
     initTheme();
     loadChatHistory();
 });
+
+// Export for testing
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        escapeHTML
+    };
+}
