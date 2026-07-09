@@ -224,7 +224,7 @@ function appendBotMessage(markdownText, animate) {
     div.className = `flex gap-4 message-container message-bot ${animate ? 'animate-slide-up' : ''}`;
 
     // Parse markdown (Feature 3)
-    const htmlContent = marked.parse(markdownText);
+    const htmlContent = DOMPurify.sanitize(marked.parse(markdownText));
 
     div.innerHTML = `
         <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center shrink-0 mt-1">
@@ -375,7 +375,7 @@ async function generateResponse(userText) {
         // Parse markdown progressively
         // Note: marked might break tags if parsed mid-way, for a robust solution you'd buffer complete blocks,
         // but for a simple simulation this works well enough.
-        contentBox.innerHTML = marked.parse(currentText) + '<span class="streaming-cursor ml-1 inline-block w-2 h-4 bg-gray-500 animate-pulse"></span>';
+        contentBox.innerHTML = DOMPurify.sanitize(marked.parse(currentText)) + '<span class="streaming-cursor ml-1 inline-block w-2 h-4 bg-gray-500 animate-pulse"></span>';
 
         scrollToBottom();
 
@@ -384,7 +384,7 @@ async function generateResponse(userText) {
     }
 
     // Final render with syntax highlighting
-    contentBox.innerHTML = marked.parse(fullResponseText);
+    contentBox.innerHTML = DOMPurify.sanitize(marked.parse(fullResponseText));
 
     // Apply syntax highlighting
     contentBox.querySelectorAll('pre code').forEach((block) => {
