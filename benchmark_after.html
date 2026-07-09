@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<body>
+<div id="chatContainer" style="height: 200px; overflow-y: auto;"></div>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+    const chatContainer = document.getElementById('chatContainer');
+    function scrollToBottom() {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    const fullResponseText = "Here is a quick JavaScript example of an arrow function:\n\n```javascript\nconst greet = (name) => {\n  console.log(`Hello, ${name}!`);\n};\n\ngreet('World');\n```".repeat(10);
+
+    async function runBenchmark() {
+        const contentBox = document.createElement('div');
+        chatContainer.appendChild(contentBox);
+        let currentText = "";
+        const chunkSize = 3;
+
+        let syncTime = 0;
+        let isScrollPending = false;
+
+        for (let i = 0; i < fullResponseText.length; i += chunkSize) {
+            currentText += fullResponseText.substring(i, i + chunkSize);
+
+            const start = performance.now();
+            contentBox.innerHTML = marked.parse(currentText) + '<span class="cursor"></span>';
+
+            if (!isScrollPending) {
+                isScrollPending = true;
+                requestAnimationFrame(() => {
+                    scrollToBottom();
+                    isScrollPending = false;
+                });
+            }
+            syncTime += (performance.now() - start);
+        }
+        console.log("Measured Sync Time After Optimization:", syncTime);
+    }
+
+    runBenchmark();
+</script>
+</body>
+</html>
