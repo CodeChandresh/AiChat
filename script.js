@@ -61,7 +61,8 @@ function loadChatHistory() {
     const savedKB = localStorage.getItem('knowledgeBase');
     if (savedKB) {
         try {
-            knowledgeBase = JSON.parse(savedKB);
+            const parsed = JSON.parse(savedKB);
+            knowledgeBase = parsed.map(item => typeof item === 'string' ? { chunk: item, lowerChunk: item.toLowerCase() } : item);
         } catch(e) {
             console.error("Error loading knowledge base", e);
             knowledgeBase = [];
@@ -146,7 +147,10 @@ function processDocument(text, filename) {
     const chunks = text.split(/\n\s*\n/).map(chunk => chunk.trim()).filter(chunk => chunk.length > 0);
 
     // Add to knowledge base
-    knowledgeBase = chunks;
+    knowledgeBase = chunks.map(chunk => ({
+        chunk: chunk,
+        lowerChunk: chunk.toLowerCase()
+    }));
 
     // Notify user
     const sysMsg = `*System:* Uploaded \`${filename}\` successfully. Extracted ${chunks.length} chunks into the knowledge base. Try asking questions about it!`;
@@ -276,13 +280,13 @@ function searchKnowledgeBase(query) {
     if (queryWords.length === 0) return null;
 
     // Score chunks based on keyword overlap
-    const scoredChunks = knowledgeBase.map(chunk => {
-        const lowerChunk = chunk.toLowerCase();
+    const scoredChunks = knowledgeBase.map(item => {
+        const lowerChunk = item.lowerChunk;
         let score = 0;
         queryWords.forEach(word => {
             if (lowerChunk.includes(word)) score++;
         });
-        return { chunk, score };
+        return { chunk: item.chunk, score };
     });
 
     // Sort by highest score
