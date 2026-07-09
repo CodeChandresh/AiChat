@@ -365,17 +365,30 @@ async function generateResponse(userText) {
     const contentBox = div.querySelector('.response-content');
 
     // Stream simulation
-    let currentText = "";
+    const fullHTML = marked.parse(fullResponseText);
+    let currentHTML = "";
     // Break by chunks (characters or words to make it look like streaming)
     const chunkSize = 3;
 
-    for (let i = 0; i < fullResponseText.length; i += chunkSize) {
-        currentText += fullResponseText.substring(i, i + chunkSize);
+    for (let i = 0; i < fullHTML.length; ) {
+        if (fullHTML[i] === '<') {
+            let endIdx = fullHTML.indexOf('>', i);
+            if (endIdx === -1) endIdx = fullHTML.length - 1;
+            currentHTML += fullHTML.substring(i, endIdx + 1);
+            i = endIdx + 1;
+            continue;
+        }
 
-        // Parse markdown progressively
-        // Note: marked might break tags if parsed mid-way, for a robust solution you'd buffer complete blocks,
-        // but for a simple simulation this works well enough.
-        contentBox.innerHTML = marked.parse(currentText) + '<span class="streaming-cursor ml-1 inline-block w-2 h-4 bg-gray-500 animate-pulse"></span>';
+        let nextChunk = fullHTML.substring(i, i + chunkSize);
+        let tagIndex = nextChunk.indexOf('<');
+        if (tagIndex !== -1) {
+            nextChunk = nextChunk.substring(0, tagIndex);
+        }
+
+        currentHTML += nextChunk;
+        i += nextChunk.length;
+
+        contentBox.innerHTML = currentHTML + '<span class="streaming-cursor ml-1 inline-block w-2 h-4 bg-gray-500 animate-pulse"></span>';
 
         scrollToBottom();
 
@@ -383,8 +396,8 @@ async function generateResponse(userText) {
         await new Promise(r => setTimeout(r, 10 + Math.random() * 30));
     }
 
-    // Final render with syntax highlighting
-    contentBox.innerHTML = marked.parse(fullResponseText);
+    // Final render without the cursor
+    contentBox.innerHTML = fullHTML;
 
     // Apply syntax highlighting
     contentBox.querySelectorAll('pre code').forEach((block) => {
