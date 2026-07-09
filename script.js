@@ -149,7 +149,7 @@ function processDocument(text, filename) {
     knowledgeBase = chunks;
 
     // Notify user
-    const sysMsg = `*System:* Uploaded \`${filename}\` successfully. Extracted ${chunks.length} chunks into the knowledge base. Try asking questions about it!`;
+    const sysMsg = `*System:* Uploaded \`${escapeHTML(filename)}\` successfully. Extracted ${chunks.length} chunks into the knowledge base. Try asking questions about it!`;
     appendBotMessage(sysMsg, true);
 
     // Save to history so the system message persists
@@ -414,6 +414,7 @@ function escapeHTML(str) {
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;')
+        .replace(/`/g, '&#96;')
         .replace(/\n/g, '<br>');
 }
 
