@@ -14,6 +14,11 @@ let isGenerating = false;
 let chatHistory = [];
 let knowledgeBase = [];
 
+const BOT_AVATAR_HTML = `
+        <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center shrink-0 mt-1">
+            <i class="fa-solid fa-robot text-white text-sm"></i>
+        </div>`;
+
 // Configuration for Marked.js and Highlight.js
 marked.setOptions({
     highlight: function(code, lang) {
@@ -227,9 +232,7 @@ function appendBotMessage(markdownText, animate) {
     const htmlContent = marked.parse(markdownText);
 
     div.innerHTML = `
-        <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center shrink-0 mt-1">
-            <i class="fa-solid fa-robot text-white text-sm"></i>
-        </div>
+${BOT_AVATAR_HTML}
         <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl rounded-tl-none shadow-sm max-w-[80%] prose dark:prose-invert break-words overflow-x-auto">
             ${htmlContent}
         </div>
@@ -253,9 +256,7 @@ function showTypingIndicator() {
     div.className = 'flex gap-4 message-container message-bot animate-slide-up';
 
     div.innerHTML = `
-        <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center shrink-0 mt-1">
-            <i class="fa-solid fa-robot text-white text-sm"></i>
-        </div>
+${BOT_AVATAR_HTML}
         <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl rounded-tl-none shadow-sm flex items-center gap-1">
             <div class="typing-dot bg-gray-400 w-2 h-2 rounded-full"></div>
             <div class="typing-dot bg-gray-400 w-2 h-2 rounded-full" style="animation-delay: 0.2s"></div>
@@ -353,9 +354,7 @@ async function generateResponse(userText) {
     div.className = `flex gap-4 message-container message-bot`;
 
     div.innerHTML = `
-        <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center shrink-0 mt-1">
-            <i class="fa-solid fa-robot text-white text-sm"></i>
-        </div>
+${BOT_AVATAR_HTML}
         <div class="response-content bg-white dark:bg-gray-800 p-4 rounded-2xl rounded-tl-none shadow-sm max-w-[80%] prose dark:prose-invert break-words overflow-x-auto min-h-[50px]">
             <span class="streaming-cursor"></span>
         </div>
